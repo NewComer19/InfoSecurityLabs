@@ -7,8 +7,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 public class Test {
+
     public static void main(String[] args) {
-        File dbUsers = new File("dbusers.txt");
+        File dbUsers = new File("C:\\Users\\galey\\IdeaProjects\\SecLab1\\dbusers.txt");
 
         try {
             String username = "user3";
@@ -22,9 +23,11 @@ public class Test {
                 }
 //                    System.out.println(loginUser(username,password,dbUsers));
             }
+//            System.out.println(returnAllUsers(dbUsers));
+            changePassWithVeryfication("ADMIN","null","notnull",dbUsers);
 //                addUser(username,password,dbUsers);
-            String users = returnAllUsers(dbUsers);
-            System.out.println(users.contains(username));
+//            String users = returnAllUsers(dbUsers);
+//            System.out.println(users.contains(username));
 
 
         } catch (IOException e) {
@@ -58,6 +61,7 @@ public class Test {
         String text = "";
         try
         {
+
             br = new BufferedReader(new FileReader(file));
             String line;
             while((line = br.readLine()) != null)
@@ -82,4 +86,43 @@ public class Test {
         return text;
     }
 
+    public static void changePassWithVeryfication(String user, String oldPass, String newPass, File file)
+    {
+        BufferedReader br=null;
+        String oldContent = "";
+        String newContent = "";
+        try
+        {
+
+            br = new BufferedReader(new FileReader(file));
+            String line = "";
+            while((line = br.readLine()) != null)
+            {
+
+                oldContent+=line  + System.lineSeparator();
+
+
+            }
+            System.out.println(oldContent);
+            if(oldContent.contains(user + ":" + oldPass + ";"))
+            {
+                newContent = oldContent.replace(oldPass,newPass);
+            }
+            FileOutputStream fileOut = new FileOutputStream(file);
+            fileOut.write(newContent.getBytes());
+            fileOut.close();
+
+        }
+        catch (IOException e)
+        {
+            System.err.println(e);
+        }
+        finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

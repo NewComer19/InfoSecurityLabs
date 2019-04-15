@@ -1,4 +1,4 @@
-ADMIN:null;
+ADMIN:notnull;
 user1:user;
 user2:user;
 user3:user;
