@@ -23,7 +23,8 @@ public class Test {
 //                    System.out.println(loginUser(username,password,dbUsers));
             }
 //                addUser(username,password,dbUsers);
-                checkIfUserIsInDb(username,dbUsers);
+            String users = returnAllUsers(dbUsers);
+            System.out.println(users.contains(username));
 
 
         } catch (IOException e) {
@@ -50,17 +51,20 @@ public class Test {
         }
 
     }
-    public static void checkIfUserIsInDb(String username, File file)
+
+    public static String returnAllUsers(File file)
     {
         BufferedReader br = null;
+        String text = "";
         try
         {
             br = new BufferedReader(new FileReader(file));
             String line;
             while((line = br.readLine()) != null)
             {
+                text += line;
                String[] newLine= line.replace(';',' ').trim().split(":");
-                System.out.println(Arrays.toString(newLine));
+
             }
 
         }
@@ -75,7 +79,7 @@ public class Test {
                 e.printStackTrace();
             }
         }
-
+        return text;
     }
 
 }

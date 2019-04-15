@@ -1,14 +1,5 @@
 package sample;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.ResourceBundle;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,7 +10,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.omg.CORBA.Any;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
 
 public class Controller {
 
@@ -51,7 +52,8 @@ public class Controller {
         {
             String username = usernameField.getText().trim();
             String password = passwordField.getText().trim();
-            int authKey = login(username, password, dbUsers, br);
+            int authKey = login(username, password, dbUsers);
+            System.out.println(authKey);
             if(authKey == 0)
             {
                 numOfTriesWithIncorrectPassword++;
@@ -73,7 +75,6 @@ public class Controller {
             }
             else if (authKey == 2)
             {
-                System.out.println(username + " " + password);
                 loginBtn.getScene().getWindow().hide();
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getResource("/sample/adminHomeScreen.fxml"));
@@ -103,64 +104,90 @@ public class Controller {
     }
 
 
-    static int login(String username, String password, File file, BufferedReader br) {
-        int authKey = 4;
-        try
-        {
-            br = new BufferedReader(new FileReader(file));
-            ArrayList<String[]> al = new ArrayList<>();
-            String line;
-            String users="";
-            while((line = br.readLine()) != null) {
-                String[] newLine = line.replace(';', ' ').trim().split(":");
-                users+=newLine + ",";
-                System.out.println(!newLine[1].equals(password));
-                if(newLine[0].equals(username) && !newLine[1].equals(password))
+    static int login(String username, String password, File file) {
+        int authKey = 5;
+        ArrayList<String[]> al = new ArrayList<>();
+        String text = Test.returnAllUsers(file);
+        if (text.contains(username)) {
+            String[] users = text.split(";");
+            for (int i = 0; i < users.length; i++) {
+                String[] user = users[i].split(":");
+                System.out.println(user[0]);
+                System.out.println(user[1]);
+                if (user[0].equals(username) && user[1].equals(password) && !user[0].equals("ADMIN"))
                 {
-                    System.out.println("Found it");
-                    authKey= 0;
-                }
-                else if(newLine[0].equals(username) && newLine[1].equals(password) && newLine[0].equals("ADMIN") && newLine[1].equals(adminPass))
+                    return 3;
+                } else if (user[0].equals("ADMIN") && user[1].equals(password))
                 {
-                    authKey= 2;
-
-                }
-                else if(newLine[0].equals(username) && newLine[1].equals(password))
+                    return 2;
+                } else if (user[0].equals(username) && !Objects.equals(user[1], password))
                 {
-                    authKey= 3;
+                    return 0;
                 }
-
-
-                else
-                    System.out.println("Wtf");
-                System.out.println(Arrays.toString(newLine));
             }
-            String[] usersInArray = users.split(",");
-            for(String user: usersInArray)
-            {
-                if(!user.equals(username))
-                {
-                    authKey= 1;
-                }
-                else
-                    authKey= 0;
-            }
+        } else {
+            return 4;
         }
-        catch (IOException e)
-        {
-            System.err.println(e);
-        }
-        finally {
-            try {
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("AuthKey " +authKey );
+
+//        try
+//        {
+//            br = new BufferedReader(new FileReader(file));
+//
+//            String line;
+//
+//            while((line = br.readLine()) != null) {
+//                System.out.println(line);
+//
+//                String[] newLine = line.replace(';', ' ').trim().split(":");
+//                al.add(newLine);
+//                System.out.println(Arrays.toString(newLine));
+//                System.out.println(!newLine[1].equals(password));
+//                if(newLine[0].equals(username) && !newLine[1].equals(password))
+//                {
+//                    System.out.println("Found it");
+//                    authKey= 0;
+//                }
+//                else if(newLine[0].equals(username) && newLine[1].equals(password) && newLine[0].equals("ADMIN") && newLine[1].equals(adminPass))
+//                {
+//                    authKey= 2;
+//
+//                }
+//                else if(newLine[0].equals(username) && newLine[1].equals(password))
+//                {
+//                    authKey= 3;
+//                }
+//
+//
+//                else
+//                    System.out.println("Wtf");
+//                System.out.println(Arrays.toString(newLine));
+//            }
+//            String[] usersInArray = users.split(",");
+//            for(String user: usersInArray)
+//            {
+//                if(!user.equals(username))
+//                {
+//                    authKey= 1;
+//                }
+//                else
+//                    authKey= 0;
+//            }
+//        }
+//        catch (IOException e)
+//        {
+//            System.err.println(e);
+//        }
+//        finally {
+//            try {
+//                br.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
         return authKey;
 
     }
+
 
     public static void load(FXMLLoader loader)
     {
