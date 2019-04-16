@@ -25,7 +25,8 @@ public class Test {
 //                    System.out.println(loginUser(username,password,dbUsers));
             }
 //            System.out.println(returnAllUsers(dbUsers));
-            changePassWithVeryfication(username,password,"user3",dbUsers);
+            User.returnAllUsers(dbUsers);
+//            changePassWithVeryfication(username,password,"user3",dbUsers);
 //                addUser(username,password,dbUsers);
 //            String users = returnAllUsers(dbUsers);
 //            System.out.println(users.contains(username));

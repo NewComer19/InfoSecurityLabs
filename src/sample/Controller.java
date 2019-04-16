@@ -95,6 +95,7 @@ public class Controller {
                 loader.setLocation(getClass().getResource("/sample/adminHomeScreen.fxml"));
                 try {
                     loader.load();
+                    adminHomeController.initialize(load(loader));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -147,12 +148,13 @@ public class Controller {
 
     }
 
-    public static void load(FXMLLoader loader)
+    public static Stage load(FXMLLoader loader)
     {
         Parent root = loader.getRoot();
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.showAndWait();
+        return stage;
     }
 
     public static void alert(String headerText, String contentText)
