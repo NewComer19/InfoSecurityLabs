@@ -1,6 +1,7 @@
 package sample;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -24,7 +25,7 @@ public class Test {
 //                    System.out.println(loginUser(username,password,dbUsers));
             }
 //            System.out.println(returnAllUsers(dbUsers));
-            changePassWithVeryfication("ADMIN","null","notnull",dbUsers);
+            changePassWithVeryfication(username,password,"user3",dbUsers);
 //                addUser(username,password,dbUsers);
 //            String users = returnAllUsers(dbUsers);
 //            System.out.println(users.contains(username));
@@ -90,7 +91,7 @@ public class Test {
     {
         BufferedReader br=null;
         String oldContent = "";
-        String newContent = "";
+        StringBuilder newContent = new StringBuilder("");
         try
         {
 
@@ -103,14 +104,34 @@ public class Test {
 
 
             }
-            System.out.println(oldContent);
+//            System.out.println(oldContent);
             if(oldContent.contains(user + ":" + oldPass + ";"))
             {
-                newContent = oldContent.replace(oldPass,newPass);
+                String[] tmp = oldContent.split(";");
+
+//                newContent = oldContent.replace(oldPass,newPass);
+//                System.out.println();
+                for (int i = 0; i <tmp.length-1 ; i++) {
+                    String trmmiedTmp = tmp[i].trim();
+                    System.out.println(trmmiedTmp);
+                    if(trmmiedTmp.equals(user + ":" + oldPass))
+                    {
+                        trmmiedTmp = user + ":" + newPass;
+
+                    }
+                    newContent.append(trmmiedTmp).append(";");
+                }
+                String newFile = newContent.toString();
+//                System.out.println("New content: ");
+//                System.out.println( newContent.toString());
+                FileOutputStream fileOut = new FileOutputStream(file);
+                fileOut.write(newFile.getBytes());
+                fileOut.close();
             }
-            FileOutputStream fileOut = new FileOutputStream(file);
-            fileOut.write(newContent.getBytes());
-            fileOut.close();
+            else
+            {
+                Controller.alert(null,"Please make sure you have entered correct password.");
+            }
 
         }
         catch (IOException e)

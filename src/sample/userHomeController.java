@@ -1,5 +1,6 @@
 package sample;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -35,10 +36,24 @@ public class userHomeController {
 
         changeBtn.setOnAction(event ->
         {
-            String username = oldPassTxt.getText().trim();
-            String password = newPassTxt.getText().trim();
+            String oldPass = oldPassTxt.getText().trim();
+            String newPass = newPassTxt.getText().trim();
+            String user = Controller.getUser();
+            File db = Controller.getDbUsers();
+            if(oldPass.isEmpty() || newPass.isEmpty())
+            {
+                Controller.alert(null,"Please enter the information in proper fields.");
+            }
+            else
+            {
+                Controller.alert(null,"Your password has successfully been changed.");
+                Test.changePassWithVeryfication(user,oldPass,newPass,db);
+            }
+        });
 
-
+        exitBtn.setOnAction(even ->
+        {
+            Platform.exit();
         });
     }
 }
