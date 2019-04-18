@@ -1,14 +1,16 @@
 package sample;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 public class Test {
+
     public static void main(String[] args) {
-        File dbUsers = new File("dbusers.txt");
+        File dbUsers = new File("C:\\Users\\galey\\IdeaProjects\\SecLab1\\dbusers.txt");
 
         try {
             String username = "user3";
@@ -22,9 +24,12 @@ public class Test {
                 }
 //                    System.out.println(loginUser(username,password,dbUsers));
             }
+//            System.out.println(returnAllUsers(dbUsers));
+            User.returnAllUsers(dbUsers);
+//            changePassWithVeryfication(username,password,"user3",dbUsers);
 //                addUser(username,password,dbUsers);
-            String users = returnAllUsers(dbUsers);
-            System.out.println(users.contains(username));
+//            String users = returnAllUsers(dbUsers);
+//            System.out.println(users.contains(username));
 
 
         } catch (IOException e) {
@@ -58,6 +63,7 @@ public class Test {
         String text = "";
         try
         {
+
             br = new BufferedReader(new FileReader(file));
             String line;
             while((line = br.readLine()) != null)
@@ -82,4 +88,53 @@ public class Test {
         return text;
     }
 
+    public static void changePassWithVeryfication(String user, String oldPass, String newPass, File file) {
+        BufferedReader br = null;
+        String oldContent = "";
+        StringBuilder newContent = new StringBuilder("");
+        try {
+
+            br = new BufferedReader(new FileReader(file));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+
+                oldContent += line + System.lineSeparator();
+
+
+            }
+//            System.out.println(oldContent);
+            if (oldContent.contains(user + ":" + oldPass + ";")) {
+                String[] tmp = oldContent.split(";");
+
+//                newContent = oldContent.replace(oldPass,newPass);
+//                System.out.println();
+                for (int i = 0; i < tmp.length - 1; i++) {
+                    String trmmiedTmp = tmp[i].trim();
+                    System.out.println(trmmiedTmp);
+                    if (trmmiedTmp.equals(user + ":" + oldPass)) {
+                        trmmiedTmp = user + ":" + newPass;
+
+                    }
+                    newContent.append(trmmiedTmp).append(";");
+                }
+                String newFile = newContent.toString();
+//                System.out.println("New content: ");
+//                System.out.println( newContent.toString());
+                FileOutputStream fileOut = new FileOutputStream(file);
+                fileOut.write(newFile.getBytes());
+                fileOut.close();
+            } else {
+                Controller.alert(null, "Please make sure you have entered correct password.");
+            }
+
+        } catch (IOException e) {
+            System.err.println(e);
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package sample;
 
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,20 +42,35 @@ public class Controller {
     private Button loginBtn;
 
     private int  numOfTriesWithIncorrectPassword = 0;
-    private File dbUsers = new File("dbusers.txt");
-    private BufferedReader br = null;
-    private Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    private static String adminPass = "null";
+    private static File dbUsers = new File("dbusers.txt");
+    private static String user = "";
+
+    public static String getUser() {
+        return user;
+    }
+
+    public static File getDbUsers() {
+        return dbUsers;
+    }
+
+
+
 
     @FXML
     void initialize() {
-        alert.setTitle("Error");
+
+
         loginBtn.setOnAction(event ->
         {
+
             String username = usernameField.getText().trim();
+//            String username ="user";
+            System.out.println(username);
             String password = passwordField.getText().trim();
+            user(username);
             int authKey = login(username, password, dbUsers);
             System.out.println(authKey);
+
             if(authKey == 0)
             {
                 numOfTriesWithIncorrectPassword++;
@@ -61,20 +78,16 @@ public class Controller {
                 {
                     Platform.exit();
                 }
-
-                alert.setHeaderText(null);
-                alert.setContentText("Incorrect Password. Please try again.");
-                alert.showAndWait();
+                alert(null, "Incorrect Password. Please try again.");
 
             }
             else if(authKey == 1)
             {
-                alert.setHeaderText(null);
-                alert.setContentText("No such user. Please concat admin.");
-                alert.showAndWait();
+                alert(null, "No such user. Please concat admin.");
             }
             else if (authKey == 2)
             {
+
                 loginBtn.getScene().getWindow().hide();
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getResource("/sample/adminHomeScreen.fxml"));
@@ -103,7 +116,6 @@ public class Controller {
 
     }
 
-
     static int login(String username, String password, File file) {
         int authKey = 5;
         ArrayList<String[]> al = new ArrayList<>();
@@ -129,71 +141,28 @@ public class Controller {
             return 4;
         }
 
-//        try
-//        {
-//            br = new BufferedReader(new FileReader(file));
-//
-//            String line;
-//
-//            while((line = br.readLine()) != null) {
-//                System.out.println(line);
-//
-//                String[] newLine = line.replace(';', ' ').trim().split(":");
-//                al.add(newLine);
-//                System.out.println(Arrays.toString(newLine));
-//                System.out.println(!newLine[1].equals(password));
-//                if(newLine[0].equals(username) && !newLine[1].equals(password))
-//                {
-//                    System.out.println("Found it");
-//                    authKey= 0;
-//                }
-//                else if(newLine[0].equals(username) && newLine[1].equals(password) && newLine[0].equals("ADMIN") && newLine[1].equals(adminPass))
-//                {
-//                    authKey= 2;
-//
-//                }
-//                else if(newLine[0].equals(username) && newLine[1].equals(password))
-//                {
-//                    authKey= 3;
-//                }
-//
-//
-//                else
-//                    System.out.println("Wtf");
-//                System.out.println(Arrays.toString(newLine));
-//            }
-//            String[] usersInArray = users.split(",");
-//            for(String user: usersInArray)
-//            {
-//                if(!user.equals(username))
-//                {
-//                    authKey= 1;
-//                }
-//                else
-//                    authKey= 0;
-//            }
-//        }
-//        catch (IOException e)
-//        {
-//            System.err.println(e);
-//        }
-//        finally {
-//            try {
-//                br.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
         return authKey;
 
     }
 
-
-    public static void load(FXMLLoader loader)
-    {
+    public static Stage load(FXMLLoader loader) {
         Parent root = loader.getRoot();
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.showAndWait();
+        return stage;
+    }
+
+    public static void alert(String headerText, String contentText) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Error");
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.showAndWait();
+    }
+
+    public static void user(String username) {
+        user = username;
+
     }
 }
