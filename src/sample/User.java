@@ -42,8 +42,7 @@ public class User {
         this.isRestricted = isRestricted;
     }
 
-    public User(String username, String password)
-    {
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.isBanned = new CheckBox();
@@ -52,16 +51,14 @@ public class User {
         checkIfUserIsRestricted();
     }
 
-    public static ArrayList<User> returnAllUsers(File db)
-    {
+    public static ArrayList<User> returnAllUsers(File db) {
         ArrayList<User> users = new ArrayList<>();
         String[] textUsers = Test.returnAllUsers(db).split(";");
 
         for (int i = 0; i < textUsers.length; i++) {
             String[] separatedUser = textUsers[i].split(":");
-            users.add(new User(separatedUser[0],separatedUser[1]));
+            users.add(new User(separatedUser[0], separatedUser[1]));
         }
-
 
         return users;
     }

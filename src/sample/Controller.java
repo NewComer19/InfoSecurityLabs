@@ -1,7 +1,6 @@
 package sample;
 
 
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,7 +8,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-
 
 
 import java.io.BufferedReader;
@@ -32,7 +30,7 @@ public class Controller {
     private URL location;
 
     @FXML
-    private  TextField usernameField;
+    private TextField usernameField;
 
     @FXML
     private PasswordField passwordField;
@@ -90,12 +88,12 @@ public class Controller {
                 {
                     Platform.exit();
                 }
-                alert(null,"Incorrect Password. Please try again.");
+                alert(null, "Incorrect Password. Please try again.");
 
             }
             else if(authKey == 1)
             {
-                alert(null,"No such user. Please concat admin.");
+                alert(null, "No such user. Please concat admin.");
             }
             else if (authKey == 2)
             {
@@ -168,8 +166,7 @@ public class Controller {
 
     }
 
-    public static Stage load(FXMLLoader loader)
-    {
+    public static Stage load(FXMLLoader loader) {
         Parent root = loader.getRoot();
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
@@ -177,16 +174,15 @@ public class Controller {
         return stage;
     }
 
-    public static void alert(String headerText, String contentText)
-    {
+    public static void alert(String headerText, String contentText) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Error");
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
         alert.showAndWait();
     }
-    public static void user(String username)
-    {
+
+    public static void user(String username) {
         user = username;
 
     }
