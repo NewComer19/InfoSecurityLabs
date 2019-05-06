@@ -5,50 +5,50 @@ import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Test {
-
+    private static  File allUsers = Controller.getDbUsers();
     public static void main(String[] args) {
-        File dbUsers = new File("C:\\Users\\galey\\IdeaProjects\\SecLab1\\dbusers.txt");
+//        File dbUsers = new File("C:\\Users\\galey\\IdeaProjects\\SecLab1\\dbusers.txt");
 
         try {
-            String username = "user3";
-            String password = "user";
-            if(!dbUsers.exists())
-                dbUsers.createNewFile();
-            else{
-                if(password == "")
-                {
-                    password = "null";
-                }
-//                    System.out.println(loginUser(username,password,dbUsers));
-            }
-//            System.out.println(returnAllUsers(dbUsers));
-            User.returnAllUsers(dbUsers);
-//            changePassWithVeryfication(username,password,"user3",dbUsers);
-//                addUser(username,password,dbUsers);
-//            String users = returnAllUsers(dbUsers);
-//            System.out.println(users.contains(username));
 
+            if(!allUsers.exists())
+                allUsers.createNewFile();
+
+//            System.out.println(returnAllUsers(dbUsers));
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void addUser(String username, String password, File file){
+    public static void addUser(User user){
         try
         {
+            String password = user.getPassword();
+            String username = user.getUsername();
+
             Writer write;
-            write = new BufferedWriter(new FileWriter(file,true));
+            write = new BufferedWriter(new FileWriter(allUsers,true));
             if(password.equals(""))
             {
                 password = null;
             }
             String text = username + ":" + password + ";";
-            write.append(text);
-            write.close();
+            if(checkIfTheUsernameIsUnique(user,allUsers))
+            {
+                Controller.alert(null,"User with such username already exists.");
+            }
+            else
+            {
+                write.append(text);
+                write.close();
+            }
+
+
         }
         catch(IOException  e)
         {
@@ -91,6 +91,8 @@ public class Test {
     public static void changePassWithVeryfication(String user, String oldPass, String newPass, File file)
     {
         BufferedReader br=null;
+        if(oldPass.equals(""))
+            oldPass = "null";
         String oldContent = "";
         StringBuilder newContent = new StringBuilder("");
         try
@@ -146,5 +148,55 @@ public class Test {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static ArrayList<User> returnAllUsersInArray(File db)
+    {
+        ArrayList<User> users = new ArrayList<>();
+        String[] textUsers = returnAllUsers(db).split(";");
+
+        for (int i = 0; i < textUsers.length; i++) {
+            String[] separatedUser = textUsers[i].split(":");
+            users.add(new User(separatedUser[0],separatedUser[1]));
+        }
+
+
+        return users;
+    }
+
+    public static boolean checkIfTheUsernameIsUnique(User usr, File db)
+    {
+        String username = usr.getUsername();
+        String alluser = returnAllUsers(db);
+        return alluser.contains(username);
+    }
+
+    public static void addUserToLists(User user, File db)
+    {
+        try
+        {
+
+            String username = user.getUsername();
+
+            Writer write;
+            write = new BufferedWriter(new FileWriter(db,true));
+            String text = username + ";";
+            if(checkIfTheUsernameIsUnique(user,db))
+            {
+                Controller.alert(null,"User with such username already exists.");
+            }
+            else
+            {
+                write.append(text);
+                write.close();
+            }
+
+
+        }
+        catch(IOException  e)
+        {
+            System.err.println(e);
+        }
+
     }
 }

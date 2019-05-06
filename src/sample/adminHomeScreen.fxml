@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--<?import com.gluonhq.charm.glisten.control.TextField?>-->
+
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" style="-fx-background-color: #fafafa;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.adminHomeController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="455.0" prefWidth="762.0" style="-fx-background-color: #fafafa;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.adminHomeController">
     <children>
-      <Label layoutX="298.0" layoutY="98.0" text="Welcome, admin!" />
-        <Label layoutX="318.0" layoutY="28.0" text="Lab1">
+        <Label layoutX="334.0" layoutY="84.0" text="Welcome, admin!" />
+        <Label layoutX="354.0" layoutY="27.0" text="Lab1">
             <font>
                 <Font name="Bernard MT Condensed" size="30.0" />
             </font>
         </Label>
-      <Button layoutX="538.0" layoutY="153.0" mnemonicParsing="false" text="Change password" />
-      <Button layoutX="532.0" layoutY="200.0" mnemonicParsing="false" text="Add user to ban-list" />
-      <Button layoutX="513.0" layoutY="244.0" mnemonicParsing="false" text="Add user to restrictions-list" />
-      <Button layoutX="561.0" layoutY="290.0" mnemonicParsing="false" text="Add user" />
-      <TableView fx:id="table" layoutX="14.0" layoutY="126.0" prefHeight="238.0" prefWidth="464.0">
-        <columns>
-          <TableColumn prefWidth="128.79999351501465" text="user" />
-          <TableColumn minWidth="0.0" prefWidth="142.4000244140625" text="password" />
-            <TableColumn  prefWidth="181.5999816894531" text="Action" />
-        </columns>
-      </TableView>
+        <Button fx:id="addUserBtn" layoutX="629.0" layoutY="395.0" mnemonicParsing="false" text="Add user" />
+        <TableView fx:id="table" layoutX="14.0" layoutY="126.0" prefHeight="238.0" prefWidth="714.0">
+            <columns>
+                <TableColumn fx:id="username" prefWidth="174.40002727508545" text="user" />
+                <TableColumn fx:id="password" minWidth="0.0" prefWidth="263.9999237060547" text="password" />
+            <TableColumn fx:id="banCol" minWidth="2.4000244140625" prefWidth="102.4000244140625" text="isBanned" />
+            <TableColumn fx:id="restrCol" prefWidth="172.7999267578125" text="isRestricted" />
+            </columns>
+        </TableView>
+      <TextField fx:id="addUserTxt" layoutX="427.0" layoutY="395.0" />
+      <Button fx:id="changePassBtn" layoutX="14.0" layoutY="395.0" mnemonicParsing="false" text="Change password" />
+      <Button fx:id="updateBtn" layoutX="153.0" layoutY="395.0" mnemonicParsing="false" text="Update" />
     </children>
 </AnchorPane>

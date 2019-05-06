@@ -7,10 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 
@@ -45,7 +42,10 @@ public class Controller {
 
     private int  numOfTriesWithIncorrectPassword = 0;
     private static File dbUsers = new File("dbusers.txt");
+    private static File bannedUsers = new File("banUser.txt");
+    private static File restrictedUsers = new File("restrUsеr.txt");
     private static String user = "";
+    private static String pass = "";
 
     public static String getUser() {
         return user;
@@ -55,8 +55,17 @@ public class Controller {
         return dbUsers;
     }
 
+    public static String getPass() {
+        return pass;
+    }
 
+    public static File getBannedUsers() {
+        return bannedUsers;
+    }
 
+    public static File getRestrictedUsers() {
+        return restrictedUsers;
+    }
 
     @FXML
     void initialize() {
@@ -70,6 +79,7 @@ public class Controller {
             System.out.println(username);
             String password = passwordField.getText().trim();
             user(username);
+            oldPass(password);
             int authKey = login(username, password, dbUsers);
             System.out.println(authKey);
 
@@ -95,7 +105,6 @@ public class Controller {
                 loader.setLocation(getClass().getResource("/sample/adminHomeScreen.fxml"));
                 try {
                     loader.load();
-                    adminHomeController.initialize(load(loader));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -103,15 +112,23 @@ public class Controller {
             }
             else if(authKey == 3)
             {
-                loginBtn.getScene().getWindow().hide();
-                FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(getClass().getResource("/sample/userHomeScreen.fxml"));
-                try {
-                    loader.load();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(adminHomeController.checkIfUserIsRestrictedOrBanned(username,Controller.getBannedUsers()))
+                {
+                    alert(null,"You are banned, please contact admin for more details");
                 }
-                load(loader);
+                else
+                {
+                    loginBtn.getScene().getWindow().hide();
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("/sample/userHomeScreen.fxml"));
+                    try {
+                        loader.load();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    load(loader);
+                }
+
             }
 
 
@@ -126,7 +143,10 @@ public class Controller {
         if (text.contains(username)) {
             String[] users = text.split(";");
             for (int i = 0; i < users.length; i++) {
+
                 String[] user = users[i].split(":");
+                if(user[1].equals("null"))
+                    user[1] = "";
                 System.out.println(user[0]);
                 System.out.println(user[1]);
                 if (user[0].equals(username) && user[1].equals(password) && !user[0].equals("ADMIN"))
@@ -168,6 +188,12 @@ public class Controller {
     public static void user(String username)
     {
         user = username;
+
+    }
+
+    public static void oldPass(String password)
+    {
+        pass = password;
 
     }
 }

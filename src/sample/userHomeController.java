@@ -39,15 +39,44 @@ public class userHomeController {
             String oldPass = oldPassTxt.getText().trim();
             String newPass = newPassTxt.getText().trim();
             String user = Controller.getUser();
+            String oldPassForNullCheck = Controller.getPass();
+//            if(oldPassForNullCheck.equals(""))
+//            {
+//                oldPass = "null";
+//            }
+            System.out.println(oldPassForNullCheck);
             File db = Controller.getDbUsers();
-            if(oldPass.isEmpty() || newPass.isEmpty())
+
+            if(newPass.isEmpty())
             {
-                Controller.alert(null,"Please enter the information in proper fields.");
+                Controller.alert(null,"Please enter the information in new password field.");
             }
-            else
+            if(adminHomeController.checkIfUserIsRestrictedOrBanned(user, Controller.getRestrictedUsers()))
+            {
+                if(checkIfNewPassHaveRestrictedSymbols(newPass))
+                {
+                    Controller.alert(null,"You have restrictions on your passwords.Please enter " +
+                            "password without latin, cyrillic and special symbols");
+                }
+            }
+            else if(oldPass.isEmpty() && !oldPassForNullCheck.equals(""))
+            {
+                Controller.alert(null,"Please enter the information in old password field.");
+            }
+            else if (!oldPassForNullCheck.equals(oldPass))
+            {
+                Controller.alert(null,"Please make sure you entered correct old password.");
+
+            }
+            else if(newPass.equals(oldPass))
+            {
+                Controller.alert(null,"Your old and new password are equal, please make sure you've entered correct new password");
+            }
+            else if(oldPassForNullCheck.equals(oldPass))
             {
                 Controller.alert(null,"Your password has successfully been changed.");
                 Test.changePassWithVeryfication(user,oldPass,newPass,db);
+                changeBtn.getScene().getWindow().hide();
             }
         });
 
@@ -56,4 +85,47 @@ public class userHomeController {
             Platform.exit();
         });
     }
+
+    public boolean checkIfNewPassHaveRestrictedSymbols(String newpass)
+    {
+        boolean result = isCyrillic(newpass) || isLatin(newpass) || isSpecialSymbol(newpass);
+        System.out.println("Cyrillic"+" " + isCyrillic(newpass));
+        System.out.println("Latin"+" " + isLatin(newpass));
+        System.out.println("Special"+" " + isSpecialSymbol(newpass));
+        return  result;
+
+    }
+
+    public boolean isCyrillic(String str)
+    {
+        boolean result = false;
+        for (char a : str.toCharArray()) {
+            if (Character.UnicodeBlock.of(a) == Character.UnicodeBlock.CYRILLIC) {
+                result = !result;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public boolean isLatin(String str)
+    {
+        boolean result = str.matches("[A-Za-z]++");
+
+        return result;
+    }
+
+    public boolean isSpecialSymbol(String str)
+    {
+        char[] specialSymbols = new char[]{'.',',',':',';','\'','\"','[',']','{','}','(',')','-','!','/'};
+        for (Character c: str.toCharArray()) {
+            for (Character b:specialSymbols) {
+                if(c.equals(b))
+                    return true;
+            }
+        }
+        return false;
+
+    }
+
 }
