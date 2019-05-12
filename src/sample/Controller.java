@@ -1,6 +1,7 @@
 package sample;
 
 
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -8,17 +9,24 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import sample.InformationGatherer.GetInfo;
+import sample.WinRegistry.WinRegistry;
 
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.*;
 
 
 public class Controller {
@@ -38,6 +46,7 @@ public class Controller {
     @FXML
     private Button loginBtn;
 
+    private String pubKeyFile = "C:\\Users\\galey\\Desktop\\pubKeys\\pubKey.pub";
     private int  numOfTriesWithIncorrectPassword = 0;
     private static File dbUsers = new File("dbusers.txt");
     private static File bannedUsers = new File("banUser.txt");
@@ -67,6 +76,43 @@ public class Controller {
 
     @FXML
     void initialize() {
+
+        GetInfo.getSystemInfo();
+        String computerName = GetInfo.getComputerName();
+        String currentUser = GetInfo.getCurrentUser();
+        String winDir = GetInfo.getWindowsDirectory();
+        String system32Dir = GetInfo.getSystem32Directory();
+        int screnHeight = GetInfo.getScrenHeight();
+        String keyboardInfo = GetInfo.searchXMLByAttribute("Sys.xml");
+        String keyboardType = GetInfo.returnKeyboardType(keyboardInfo);
+
+        String systemInfo = GetInfo.appendAllInfo(computerName,
+                currentUser,
+                winDir,
+                system32Dir,
+                keyboardType,
+                screnHeight,
+                System.getProperty("user.dir"));
+        String hash = hashing(systemInfo);
+        try {
+            String signature = WinRegistry.readString(
+                    WinRegistry.HKEY_CURRENT_USER,
+                    "SOFTWARE\\Kosse",
+                    "Signature");
+            PublicKey pubkey = loadPublicKeyFromFile(pubKeyFile);
+            if(!verify(hash,signature,pubkey))
+            {
+                alert(null,"Pirated verion");
+                Platform.exit();
+            }
+
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         loginBtn.setOnAction(event ->
@@ -191,5 +237,49 @@ public class Controller {
     {
         pass = password;
 
+    }
+
+    public String hashing(String text) {
+        try {
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            m.update(text.getBytes());
+            byte[] digest = m.digest();
+            BigInteger bigInt = new BigInteger(1, digest);
+            String hashtext = bigInt.toString(16);
+            System.out.println(hashtext);
+            return hashtext;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public PublicKey loadPublicKeyFromFile(String filePath)
+    {
+        Path path = Paths.get(filePath);
+        byte[] bytes = new byte[0];
+        try {
+            bytes = Files.readAllBytes(path);
+            X509EncodedKeySpec ks = new X509EncodedKeySpec(bytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            return kf.generatePublic(ks);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static boolean verify(String plainText, String signature, PublicKey publicKey) throws Exception {
+        Signature publicSignature = Signature.getInstance("SHA256withRSA");
+        publicSignature.initVerify(publicKey);
+        publicSignature.update(plainText.getBytes("UTF-8"));
+
+        byte[] signatureBytes = Base64.getDecoder().decode(signature);
+
+        return publicSignature.verify(signatureBytes);
     }
 }
